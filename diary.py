@@ -22,6 +22,9 @@ class DiaryApp (App):
         self.narrator = ""
 
     def build(self):
+        return self.MainMenu()
+
+    def MainMenu(self):
         # Draw the mainlayout, which is float, for size and position hint controls
         self.mainlayout = FloatLayout()
 
@@ -66,13 +69,13 @@ class DiaryApp (App):
         def fillGrid(newuserattr):
             Reg_Form_Layout.add_widget(
                 Label(
-                    text=f'{newuserattr}: ', size_hint_x=None,
-                    size_hint_y=0.2,
+                    text=f'{newuserattr}: ',
+                    size_hint_x=None,
+                    #size_hint_y=0,
                     pos_hint={'center_x': 0.5, 'center_y': 0.5},
                     valign='center', halign='center',
                 )
             )
-            Input1 = TextInput()
             Reg_Form_Layout.add_widget(TextInput(
                 pos_hint={'center_x': 0.5, 'top': 3/4},
                 multiline=False,
@@ -81,21 +84,28 @@ class DiaryApp (App):
         returnButton, submitButton = [
             Button(text="Back to Main Menu",
                    size_hint=(0.15, 0.15),
-                   pos_hint={'center_x': 2/5, 'center_y': 1/4},
+                   pos_hint={'center_x': 1/4, 'center_y': 1/4},
+                   valign='center', halign='center',
                    ),
-            Button(text='submit',
+
+            Button(text='Submit',
                    size_hint=(0.15, 0.15),
-                   pos_hint={'center_x': 4/5, 'center_y': 1/4},
+                   pos_hint={'center_x': 3/4, 'center_y': 1/4},
+                   valign='center', halign='center',
                    )
         ]
         for button in [returnButton, submitButton]:
-            button.texture_size = button.size
+            button.text_size = button.size
+
         for x in ['Username','Password','Full name']:
             fillGrid(x)
             userinput[x] = ""
             pass
+
         for widget in [returnButton, submitButton, Reg_Form_Layout]:
             self.mainlayout.add_widget(widget)
+
+        if all(userinput.values()): self.login_ok(userinput)
 
     def LoginCurrentUser(self, *args, **kwargs):
         self.flushLayout()
@@ -109,12 +119,18 @@ class DiaryApp (App):
             row_default_height=dp(48),
         )
 
-
     def login_ok(self, profile, *args, **kwargs):
-        # What would be the item to read?
+        print(profile)
+        for x in profile.values():
+            # Inject sqlite3 code in here
+
+            pass
+        if all(profile.values()):
+            LogoutButton, ViewRecordsButton, ChangePasswordButton = []
         pass
 
     def Dashboard(self, *args, **kwargs):
+        self.flushLayout()
         Logger.debug("Tracking: user logged in successfully with details:\n ")
         LogoutButton, ViewRecordsButton, ChangePasswordButton = [
             Button(text=buttontext) for buttontext in [
@@ -122,8 +138,8 @@ class DiaryApp (App):
             ]
         ]
 
+        self.narrator.text = "Welcome to Diary Repo!"
         # For Ryan to give the View Diary Records
-
 
 if __name__ == '__main__':
     DiaryApp().run()
