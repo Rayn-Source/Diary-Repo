@@ -119,6 +119,7 @@ class DiaryApp (App):
         ProfileMatch = False
         self.ActiveUser = dict()
         for x in profile.values():
+
             # Inject sqlite3 code in here
 
             pass
