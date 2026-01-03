@@ -13,13 +13,14 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.widget import Widget
 from kivy.logger import Logger, LOG_LEVELS, LoggerHistory
 from kivy.metrics import dp
+from win32comext.axscript.client.error import FormatForAX
 
 
 class DiaryApp (App):
     def flushLayout(self, *args, **kwargs):
         self.mainlayout.clear_widgets()
         self.mainlayout.add_widget(self.narrator)
-        self.narrator = ""
+        self.narrator.text = ""
 
     def build(self):
         return self.MainMenu()
@@ -54,7 +55,8 @@ class DiaryApp (App):
 
     def RegisterNewUser(self, *args, **kwargs):
         self.flushLayout()
-
+        self.narrator.text = (f"Hello new user! Kindly key in "
+                              f"a username, full name and password.")
         Logger.debug("Registering new user")
         Reg_Form_Layout = GridLayout(
             pos_hint={'center_x': 0.5,},
@@ -64,22 +66,20 @@ class DiaryApp (App):
             row_force_default=True,
             row_default_height = dp(27),
         )
-
-        userinput, inputlist = {}, []
-        def fillGrid(newuserattr):
+        userinput = {}
+        for key in ['Username','Password','Full name']:
+            userinput[key] = TextInput()
             Reg_Form_Layout.add_widget(
                 Label(
-                    text=f'{newuserattr}: ',
+                    text=f'{key}: ',
                     size_hint_x=None,
-                    #size_hint_y=0,
+                    # size_hint_y=0,
                     pos_hint={'center_x': 0.5, 'center_y': 0.5},
                     valign='center', halign='center',
                 )
             )
-            Reg_Form_Layout.add_widget(TextInput(
-                pos_hint={'center_x': 0.5, 'top': 3/4},
-                multiline=False,
-            ))
+
+            Reg_Form_Layout.add_widget( userinput[key])
 
         returnButton, submitButton = [
             Button(text="Back to Main Menu",
@@ -97,46 +97,53 @@ class DiaryApp (App):
         for button in [returnButton, submitButton]:
             button.text_size = button.size
 
-        for x in ['Username','Password','Full name']:
-            fillGrid(x)
-            userinput[x] = ""
-            pass
-
         for widget in [returnButton, submitButton, Reg_Form_Layout]:
             self.mainlayout.add_widget(widget)
 
-        if all(userinput.values()): self.login_ok(userinput)
+        if all(userinput.values()): self.check_input(userinput)
 
     def LoginCurrentUser(self, *args, **kwargs):
         self.flushLayout()
-        self.narrator.text = "Kindly key in login credentials!"
+        self.narrator.text = "Kindly key in login credentials."
 
         LoginForm_Layout = GridLayout(
-            pos_hint={'center_x': 0.5, 'center_y': 0.5},
+            pos_hint={'center_x': 0.5, 'y': 0},
             cols=2,
             size_hint=(0.8, 0.8),
             row_force_default=True,
             row_default_height=dp(48),
         )
 
-    def login_ok(self, profile, *args, **kwargs):
+    def check_input(self, profile, *args, **kwargs):
         print(profile)
+        ProfileMatch = False
+        self.ActiveUser = dict()
         for x in profile.values():
             # Inject sqlite3 code in here
 
             pass
-        if all(profile.values()):
-            LogoutButton, ViewRecordsButton, ChangePasswordButton = []
-        pass
+
+        if ProfileMatch and kwargs.get('mode',"") == 'login':
+            match = False
+        elif kwargs.get('mode',"") == 'register':
+            match = True
+        else: return False
 
     def Dashboard(self, *args, **kwargs):
         self.flushLayout()
         Logger.debug("Tracking: user logged in successfully with details:\n ")
-        LogoutButton, ViewRecordsButton, ChangePasswordButton = [
+        LogoutButton, ViewDiaryButton, ChangePasswordButton = [
             Button(text=buttontext) for buttontext in [
                 "Log Out", "View Diary", "Change Password"
             ]
         ]
+
+        ViewDiaryButton.bind(on_press=self.Diary)
+
+    def Diary(self, *args, **kwargs):
+        self.flushLayout()
+        self.narrator.text = "Diary entries: "
+        self.Display = TextInput(multiline=True)
 
         self.narrator.text = "Welcome to Diary Repo!"
         # For Ryan to give the View Diary Records
