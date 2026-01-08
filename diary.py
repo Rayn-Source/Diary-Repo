@@ -17,12 +17,13 @@ from win32comext.axscript.client.error import FormatForAX
 
 
 class DiaryApp (App):
+
     def flushLayout(self, *args, **kwargs):
         self.mainlayout.clear_widgets()
         self.mainlayout.add_widget(self.narrator)
         self.narrator.text = ""
 
-    def build(self):
+    def build(self,instance):
         return self.MainMenu()
 
     def MainMenu(self):
@@ -85,7 +86,7 @@ class DiaryApp (App):
             Button(text="Back to Main Menu",
                    size_hint=(0.15, 0.15),
                    pos_hint={'center_x': 1/4, 'center_y': 1/4},
-                   valign='center', halign='center',
+                   valign='center', halign='center'
                    ),
 
             Button(text='Submit',
@@ -94,6 +95,9 @@ class DiaryApp (App):
                    valign='center', halign='center',
                    )
         ]
+        returnButton.bind(on_press= self.build)
+        submitButton.bind(on_press = self.RegisterNewUser)
+
         for button in [returnButton, submitButton]:
             button.text_size = button.size
 
