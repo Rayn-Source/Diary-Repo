@@ -1,5 +1,18 @@
 import sqlite3
 from diary import RegisterNewUser 
+import pandas as pd
+import sqlite3
+
+# 1. Load your CSV
+df = pd.read_csv('users.csv')
+
+# 2. Connect to (or create) the SQLite database
+conn = sqlite3.connect('my_new_database.db')
+
+df.to_sql('imported_data', conn, if_exists='replace', index=False)
+
+conn.close()
+print("Conversion complete!")
 
 username =""
 def init_db():
