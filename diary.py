@@ -15,31 +15,22 @@ from kivy.logger import Logger, LOG_LEVELS, LoggerHistory
 from kivy.metrics import dp
 from win32comext.axscript.client.error import FormatForAX
 import sqlite3
-from diary import RegisterNewUser 
 import pandas as pd
-import sqlite3
 
 class DiaryApp (App):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        # 1. Load your CSV
-        df = pd.read_csv('users.csv')
-        
-        # 2. Connect to (or create) the SQLite database
-        self.conn = sqlite3.connect('my_new_database.db')
-        cursor = self.conn.cursor()
-        df.to_sql('imported_data', self.conn, if_exists='replace', index=False)
-        print("Conversion complete!")
+    
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
 
-def flushLayout(self, *args, **kwargs):
+    def flushLayout(self, *args, **kwargs):
         self.mainlayout.clear_widgets()
         self.mainlayout.add_widget(self.narrator)
         self.narrator.text = ""
 
-def build(self):
+    def build(self):
         return self.MainMenu()
 
-def MainMenu(self):
+    def MainMenu(self):
         # Draw the mainlayout, which is float, for size and position hint controls
         self.mainlayout = FloatLayout()
 
@@ -67,7 +58,7 @@ def MainMenu(self):
         self.mainlayout.add_widget(self.narrator)
         return self.mainlayout
 
-def RegisterNewUser(self, *args, **kwargs):
+    def RegisterNewUser(self, *args, **kwargs):
         self.flushLayout()
         self.narrator.text = (f"Hello new user! Kindly key in "
                               f"a username, full name and password.")
@@ -119,7 +110,7 @@ def RegisterNewUser(self, *args, **kwargs):
 
         if all(userinput.values()): self.check_input(userinput)
 
-def LoginCurrentUser(self, *args, **kwargs):
+    def LoginCurrentUser(self, *args, **kwargs):
         self.flushLayout()
         self.narrator.text = "Kindly key in login credentials."
 
@@ -131,13 +122,14 @@ def LoginCurrentUser(self, *args, **kwargs):
             row_default_height=dp(48),
         )
 
-def check_input(self, profile, *args, **kwargs):
+    def check_input(self, profile, *args, **kwargs):
         print(profile)
         ProfileMatch = False
         self.ActiveUser = dict()
         for x in profile.values():
-             cursor = self.conn.cursor()
-             cursor.execute("""SELECT * FROM users WHERE USERNAME=?""", (profile.get('Username'),))
+            self.cursor.execute("SELECT * FROM users WHERE UserName=?", (profile.get('Username'),))
+            rows = self.cursor.fetchall()
+        self.conn.close()
 
         if ProfileMatch and kwargs.get('mode',"") == 'login':
             match = False
@@ -145,7 +137,7 @@ def check_input(self, profile, *args, **kwargs):
             match = True
         else: return False
 
-def Dashboard(self, *args, **kwargs):
+    def Dashboard(self, *args, **kwargs):
         self.flushLayout()
         Logger.debug("Tracking: user logged in successfully with details:\n ")
         LogoutButton, ViewDiaryButton, ChangePasswordButton = [
@@ -154,9 +146,9 @@ def Dashboard(self, *args, **kwargs):
             ]
         ]
 
-        ViewDiaryButton.bind(on_press=self.Diary)
+        ViewDiaryButton.bind(on_press=self.Diary) 
 
-def Diary(self, *args, **kwargs):
+    def Diary(self, *args, **kwargs):
         self.flushLayout()
         self.narrator.text = "Diary entries: "
         self.Display = TextInput(multiline=True)
